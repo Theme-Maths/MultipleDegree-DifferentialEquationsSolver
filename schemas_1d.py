@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 """
 Contient les fonctions de résolution en 1D :
-    - euler(f, y0, t0, T, h, digits=10):
+    - euler(f, y0, t0, T, h, digits=10) :
             Résolution par la métgode d'Euler explicite.
             Renvoie un tuple (x, y) contenant les listes x et y
+    - euler_vect(F, Y0, t0, T, h) :
+            Idem que précéedemment, mais où les Y sont des vecteurs
 """
 
 
@@ -64,16 +66,16 @@ def euler_vect(F, Y0, t0, T, h):
 
     """
 
-    t_list = [t0]                        #initialisation d'une liste avec les valeurs de t
-    Y_list = [Y0]                        #initialisation d'une liste avec les valeurs de y
-    t = t0                               #initialisation de t à t0, la borne inf de l'intervalle de résolution
-    Y = Y0                               #initialisation de y à y0, la condition initiale
+    t_list = [t0]                                       #initialisation d'une liste avec les valeurs de t
+    Y_list = [Y0]                                       #initialisation d'une liste avec les valeurs de y
+    t = t0                                              #initialisation de t à t0, la borne inf de l'intervalle de résolution
+    Y = Y0                                              #initialisation de y à y0, la condition initiale
 
-    while t < T:                         #Tant que la date t est inférieure à la date T
-       t = t + h                         #on incrémente la date avec le pas de calcul h
-       t_list.append(t)                  #on ajoute cette nouvelle date à la fin de la liste des dates (round = arrondi à "digits" décimales)
+    while t < T:                                        #Tant que la date t est inférieure à la date T
+        t = t + h                                       #on incrémente la date avec le pas de calcul h
+        t_list.append(t)                                #on ajoute cette nouvelle date à la fin de la liste des dates (round = arrondi à "digits" décimales)
 
-       Y = [ y + yp * h for y, yp in zip(Y, F(t, Y)) ]        #on calcula nouvelle valeur de y
-       Y_list.append(Y)                  #on ajoute le nouveau Y à la fin de la liste des y
+        Y = [ y + yp * h for y, yp in zip(Y, F(t, Y)) ] #on calcula nouvelle valeur de y
+        Y_list.append(Y)                                #on ajoute le nouveau Y à la fin de la liste des y
 
-    return t_list, Y_list
+    return t_list, [Y_list[i][1] for i in range(len(Y_list))]
