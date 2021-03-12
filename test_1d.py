@@ -6,7 +6,6 @@ Utiliser ce code pour calculer une solution 1d et la tracer. L'exemple existant 
 - La cellule APPELS AUX FONCTIONS se charge toute seule d'appeler les fonctions souhaitées.
   Elle ne doit être modifiée que si on veut tracer plusieurs courbes, car cela implique de bidouiller les informations données à des fonctions stockées dans d'autres fichiers :)
 """
-"ceci est un test d'edit"
 import schemas_1d, traces
 
 
