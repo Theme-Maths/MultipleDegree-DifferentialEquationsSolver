@@ -129,6 +129,26 @@ def runge_kutta_4(f, y0, t0, T, h, digits=10) :
 
     return t_list, y_list
 
+def rk4_vect(F, Y0, t0, T, h, digits=10) :
+    t_list = [t0]                        #initialisation d'une liste avec les valeurs de t
+    Y_list = [Y0]                        #initialisation d'une liste avec les valeurs de y
+    t = t0                               #initialisation de t à t0, la borne inf de l'intervalle de résolution
+    Y = Y0                               #initialisation de y à y0, la condition initiale
+
+    while t < T:                         #Tant que la date t est inférieure à la date T
+       t = t + h                         #on incrémente la date avec le pas de calcul h
+       t_list.append(t)    #on ajoute cette nouvelle date à la fin de la liste des dates (round = arrondi à "digits" décimales)
+
+       k1=F(t,Y)                         #on calcule à chaque fois les coefficients k1, k2, k3, k4 pour la méthode RK4
+       k2=F(t+(h/2),Y+k1*(h/2))
+       k3=F(t+h/2,Y+k2*(h/2))
+       k4=F(t+h,Y+h*k3)
+       k = [k1, k2, k3, k4]
+       Y = [ y + (h/6)*(k1+2*k2+2*k3+k4) for y, yp in zip(Y, F(t, Y)) ]
+       Y = Y + (h/6)*(k1+2*k2+2*k3+k4)     #on calcule la nouvelle valeur de y
+       Y_list.append(Y)    #on ajoute le nouveau y à la fin de la liste des y
+
+    return t_list, Y_list
     
 
 
