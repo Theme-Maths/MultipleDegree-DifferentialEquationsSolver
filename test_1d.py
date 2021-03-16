@@ -26,9 +26,9 @@ f = lambda t, y : 0 - 0.00203 * y**2 + 9.81     #fonction de Cauchy (expression 
 
 # Cellule à modifier seulement si on veut tracer plus d'une fonction sur un graphe.
 
-x, y = schemas_1d.euler(f, y0, t0, T, h, digits=10)
-traces.trace(x, y)
+(x, y) = schemas_1d.euler(f, y0, t0, T, h, digits=10)
+traces.trace((x, y, "Méthode d'Euler"))
 
 """Tracé de RK4"""
-x, y = schemas_1d.runge_kutta(f, y0, t0, T, h, digits=10)
-traces.trace(x, y)
+(x, y) = schemas_1d.runge_kutta_4(f, y0, t0, T, h, digits=10)
+traces.trace((x, y, "Méthode RK4"))
