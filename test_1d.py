@@ -30,5 +30,9 @@ f = lambda t, y : 0 - 0.00203 * y**2 + 9.81     #fonction de Cauchy (expression 
 traces.trace((x, y, "Méthode d'Euler"))
 
 """Tracé de RK4"""
-(x, y) = schemas_1d.runge_kutta_4(f, y0, t0, T, h, digits=10)
-traces.trace((x, y, "Méthode RK4"))
+(x, y) = schemas_1d.runge_kutta_4(f, y0, t0, T, h, digits=10)  #Méthode RK4
+(a, b) = schemas_1d.euler(f, y0, t0, T, h, digits=10)
+c = np.linspace(t0, T, 1000)
+d = odeint(f, y0, c)
+traces.trace((x, y, "Méthode RK4"),(a, b, "Méthode d'Euler"),sol =(c,d))
+
