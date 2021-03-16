@@ -28,3 +28,7 @@ f = lambda t, y : 0 - 0.00203 * y**2 + 9.81     #fonction de Cauchy (expression 
 
 x, y = schemas_1d.euler(f, y0, t0, T, h, digits=10)
 traces.trace(x, y)
+
+"""Tracé de RK4"""
+x, y = schemas_1d.runge_kutta(f, y0, t0, T, h, digits=10)
+traces.trace(x, y)
