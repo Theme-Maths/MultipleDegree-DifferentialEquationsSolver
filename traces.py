@@ -31,7 +31,7 @@ def trace(*courbe, sol=None):
         #on l'entre avec les paramètres suivants : k pour black ; - - pour ligne pointillée
 
     plt.xlabel("temps")                                             #nom de l'axe des abscisses
-    plt.ylabel("y")                                                 #nom de l'axe des ordonnées
+    plt.ylabel("valeur")                                                 #nom de l'axe des ordonnées
     plt.legend()                                                    #localisation de la légende dans le coin en bas à droite
  
     plt.show()                                                      #on montre le graphique
