@@ -32,6 +32,6 @@ def trace(*courbe, sol=None):
 
     plt.xlabel("temps")                                             #nom de l'axe des abscisses
     plt.ylabel("y")                                                 #nom de l'axe des ordonnées
-    plt.legend(loc='lower left')                                    #localisation de la légende dans le coin en bas à droite
-    
+    plt.legend()                                                    #localisation de la légende dans le coin en bas à droite
+ 
     plt.show()                                                      #on montre le graphique
