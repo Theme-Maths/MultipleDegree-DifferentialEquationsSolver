@@ -59,32 +59,23 @@ def solution_dim_n(g, Y0, t0, T, h, methode='rk4'):
     """
     Résout une équation différentielle d'odre 2 avec la méthode choisie.
     Renvoie un tuple x, y de la solution calculée.
-
     Parameters
     ----------
-    g   : fonction du problème de Cauchy
-    y0  : valeur de la solution initiale de y
-    yp0 : valeur de la condition initiale de y'
+    g   : fonction du problème de Cauchy (exemple dont la solution est exp(): g = lambda t, y, yp, ypp : ypp)
+    Y0  : liste contenant les conditions initiales dans l'ordre suivant : Y = [y0, yp0, ... y_(n-1)0]
     t0  : valeur de la borne inférieure de l'intervalle de résolution
     T   : valeur de la borne supérieure de l'intervalle de résolution
     h   : valeur du pas
     methode : méthodes de résolution possibles : 'euler', 'rk4'. Vaut 'rk4' par défaut.
-
     Returns
     -------
     t_list : liste des abscisses
     Y_list : liste des approximations trouvées pour chaque t par la fonction de résolution
-
     """
-    # NOTATIONS :
-    # y   = y
-    # yp  = y'
-    # ypp = y" = g(t0, y0,  yp0) 
     
     def F(t, Y):                                                    # on définit la fonction F du nouveau problème de Cauchy
-        a = tuple(Y.insert(0,t))
-        y_np1 = g(a)                                           # on calcule la dernière coordonnée de ce que renverra F, à savoir ypp
-        return Y[1:]+[y_np1]                                            # on renvoie le vecteur (y', y")
+        y_np1 = g(t, *Y)                                            # on calcule la dernière coordonnée de ce que renverra F, à savoir la valeur de la dérivées n+1ième de  y_n+1
+        return Y[1:]+[y_np1]                                        # on renvoie le vecteur (y', y", ..., y(dérivée n+1ième))
     
     
     if methode == 'rk4':                                             # on appelle une fonction 1D pour résoudre l'équation 1D vectorielle obtenue
@@ -92,7 +83,7 @@ def solution_dim_n(g, Y0, t0, T, h, methode='rk4'):
     elif methode == 'euler':
         t_list, Y_list = schemas_1d.euler_vect(F, Y0, t0, T, h)
     else :
-        raise ValueError("Méthode non reconnue. Méthodes connues : 'rk4', 'euler'.")
+        raise AttributeError("Méthode non reconnue. Méthodes connues : 'rk4', 'euler'.")
         
     return t_list, Y_list
 
