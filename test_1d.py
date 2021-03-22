@@ -7,6 +7,8 @@ Utiliser ce code pour calculer une solution 1d et la tracer. L'exemple existant 
   Elle ne doit être modifiée que si on veut tracer plusieurs courbes, car cela implique de bidouiller les informations données à des fonctions stockées dans d'autres fichiers :)
 """
 import schemas_1d, traces
+import numpy as np
+from scipy.integrate import odeint
 
 
 #%%                     PANNEAU DE COMMANDE DES PARAMETRES
