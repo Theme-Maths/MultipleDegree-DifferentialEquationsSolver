@@ -121,17 +121,45 @@ def sol_exacte_dim_2(g, y0, yp0, t0, T, h):
 
 #%%                             COMMANDES DIRECTES
 
+# # Définition de la fonction g à résoudre
+# g = lambda t, y, yp : 3*yp - 20*y + 5
+
+# # Définition des courbes que l'on veut tracer
+# x1, y1 = solution_dim_2(g, 0, 0, 0, 1, 0.01, methode='euler')
+# x2, y2 = solution_dim_2(g, 0, 0, 0, 1, 0.01, methode='rk4')
+# x3, y3 = solution_dim_2(g, 0, 0, 0, 1, 0.1, methode='rk4')
+# xs, ys = sol_exacte_dim_2(g, 0, 0, 0, 1, 0.001)
+
+# # Traçage des courbes
+# traces.trace((x1, y1, 'Euler'), (x2, y2, 'RK4'), (x3, y3, 'RK4 pas de 0.1'), sol=(xs, ys))
+
+
+
+
+# # Définition de la fonction g à résoudre
+# g = lambda t, y, yp, ypp : 1/4 * (cos(t*ypp) - atan(yp))
+
+# # Définition des courbes que l'on veut tracer
+# x1, y1 = solution_dim_n(g, [0, 0, 0], 0, 3, 0.1, methode='euler')
+# x2, y2 = solution_dim_n(g, [0, 0, 0], 0, 3, 0.1, methode='rk4')
+# x3, y3 = solution_dim_n(g, [0, 0, 0], 0, 3, 1, methode='rk4')
+# #xs, ys = sol_exacte_dim_n(g, 0, 0, 0, 0, 1, 0.001)
+
+# # Traçage des courbes
+# traces.trace((x1, y1, 'Euler'), (x2, y2, 'RK4'), (x3, y3, 'RK4 pas de 0.1'))
+
+
+
+
 # Définition de la fonction g à résoudre
-g = lambda t, y, yp : -y
+g = lambda t, y, yp : -100 * sin(y)
 
 # Définition des courbes que l'on veut tracer
-x1, y1 = solution_dim_2(g, 1, 1, 0, 10, 0.1, methode='euler')
-x2, y2 = solution_dim_2(g, 1, 1, 0, 10, 0.1, methode='rk4')
-x3, y3 = solution_dim_2(g, 1, 1, 0, 10, 1, methode='rk4')
-xs, ys = sol_exacte_dim_2(g, 1, 1, 0, 10, 0.01)
+x1, y1 = solution_dim_n(g, [pi/3, 0], 0, 10, 0.01, methode='euler')
+x2, y2 = solution_dim_n(g, [pi/3, 0], 0, 10, 0.01, methode='rk4')
+x3, y3 = solution_dim_n(g, [pi/3, 0], 0, 10, 0.01, methode='rk4')
+xs, ys = sol_exacte_dim_2(g, pi/3, 0, 0, 10, 0.001)
 
 # Traçage des courbes
-import traces
 traces.trace((x1, y1, 'Euler'), (x2, y2, 'RK4'), (x3, y3, 'RK4 pas de 1'), sol=(xs, ys))
-
 
