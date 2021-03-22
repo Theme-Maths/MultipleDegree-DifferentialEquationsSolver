@@ -8,8 +8,8 @@ Contient les fonctions de résolution à plusieurs dimensions :
 """
 import numpy as np
 from scipy.integrate import odeint
-import schemas_1d
-import math
+import schemas_1d, traces
+from math import cos, atan, pi, sin
 
 
 
