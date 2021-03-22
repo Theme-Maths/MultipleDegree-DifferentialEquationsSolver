@@ -123,7 +123,6 @@ def sol_exacte_dim_n(g, Y0, t0, T, h):
     """
     Résout une équation différentielle d'ordre n avec odeint, méthode la plus précise implémentée dans Python.
     Renvoie un tuple x, y de la solution calculée.
-
     Parameters
     ----------
     g   : fonction du problème de Cauchy
@@ -131,20 +130,21 @@ def sol_exacte_dim_n(g, Y0, t0, T, h):
     t0  : valeur de la borne inférieure de l'intervalle de résolution
     T   : valeur de la borne supérieure de l'intervalle de résolution
     h   : valeur du pas
-
     Returns
     -------
     t_list : liste des abscisses
     Y_list : liste des ordonnées de la 'solution exacte' trouvée
-
     """
+    #Y0 = np.array(Y0)
     def F(t, Y):                                                    # on définit la fonction F du nouveau problème de Cauchy
-        y_np1 = g(t, *Y)                                            # on calcule la dernière coordonnée de ce que renverra F, à savoir la valeur de la dérivées n+1ième de  y_n+1
-        return Y[1:]+[y_np1]                                        # on renvoie le vecteur (y', y", ..., y(dérivée n+1ième))
+        y_np1 = g(t, *Y)
+        #print(np.array(np.concatenate(Y[1:], [y_np1])))                                            # on calcule la dernière coordonnée de ce que renverra F, à savoir la valeur de la dérivées n+1ième de  y_n+1
+        return list(Y[1:]).extend([y_np1])
+        #return np.array(np.concatenate(Y[1:], [y_np1]))                                        # on renvoie le vecteur (y', y", ..., y(dérivée n+1ième))
     
     x = np.linspace(t0, T, int((T-t0)/h))                           # on construit la liste des abscisses
     Y = odeint(F, Y0, x, tfirst=True)                               # on appelle scipy.integrate.odeint pour résoudre le système (utilisant une version améliorée de RK4)
-    return x, Y[:,1]
+    return x, Y[:,len(Y0)-1]
 
 #%%                             COMMANDES DIRECTES
 
