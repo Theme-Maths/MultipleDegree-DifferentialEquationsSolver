@@ -9,7 +9,7 @@ Contient les fonctions de résolution à plusieurs dimensions :
 import numpy as np
 from scipy.integrate import odeint
 import schemas_1d, traces
-from math import cos, atan, pi, sin
+from math import cos, atan, pi, sin, exp
 
 
 
@@ -17,7 +17,6 @@ def solution_dim_2(g, y0, yp0, t0, T, h, methode='rk4'):
     """
     Résout une équation différentielle d'odre 2 avec la méthode choisie.
     Renvoie un tuple x, y de la solution calculée.
-
     Parameters
     ----------
     g   : fonction du problème de Cauchy
@@ -27,12 +26,10 @@ def solution_dim_2(g, y0, yp0, t0, T, h, methode='rk4'):
     T   : valeur de la borne supérieure de l'intervalle de résolution
     h   : valeur du pas
     methode : méthodes de résolution possibles : 'euler', 'rk4'. Vaut 'rk4' par défaut.
-
     Returns
     -------
     t_list : liste des abscisses
     Y_list : liste des approximations trouvées pour chaque t par la fonction de résolution
-
     """
     # NOTATIONS :
     # y   = y
@@ -54,6 +51,7 @@ def solution_dim_2(g, y0, yp0, t0, T, h, methode='rk4'):
         raise ValueError("Méthode non reconnue. Méthodes connues : 'rk4', 'euler'.")
         
     return t_list, Y_list
+
 
 def solution_dim_n(g, Y0, t0, T, h, methode='rk4'):
     """
@@ -88,12 +86,10 @@ def solution_dim_n(g, Y0, t0, T, h, methode='rk4'):
     return t_list, Y_list
 
 
-
 def sol_exacte_dim_2(g, y0, yp0, t0, T, h):
     """
     Résout une équation différentielle d'ordre n avec odeint, méthode la plus précise implémentée dans Python.
     Renvoie un tuple x, y de la solution calculée.
-
     Parameters
     ----------
     g   : fonction du problème de Cauchy
@@ -102,12 +98,10 @@ def sol_exacte_dim_2(g, y0, yp0, t0, T, h):
     t0  : valeur de la borne inférieure de l'intervalle de résolution
     T   : valeur de la borne supérieure de l'intervalle de résolution
     h   : valeur du pas
-
     Returns
     -------
     t_list : liste des abscisses
     Y_list : liste des ordonnées de la 'solution exacte' trouvée
-
     """
     def F(t, Y):                                                    # on définit la fonction F du nouveau problème de Cauchy
         (y, yp) = Y                                                 # on explicite les composantes de Y = (y, y')
@@ -118,6 +112,7 @@ def sol_exacte_dim_2(g, y0, yp0, t0, T, h):
     x = np.linspace(t0, T, int((T-t0)/h))                           # on construit la liste des abscisses
     Y = odeint(F, Y0, x, tfirst=True)                               # on appelle scipy.integrate.odeint pour résoudre le système (utilisant une version améliorée de RK4)
     return x, Y[:,1]
+
 
 def sol_exacte_dim_n(g, Y0, t0, T, h):
     """
@@ -135,16 +130,17 @@ def sol_exacte_dim_n(g, Y0, t0, T, h):
     t_list : liste des abscisses
     Y_list : liste des ordonnées de la 'solution exacte' trouvée
     """
-    #Y0 = np.array(Y0)
+    Y0 = np.array(Y0)
+    t0 = np.array(t0)
     def F(t, Y):                                                    # on définit la fonction F du nouveau problème de Cauchy
         y_np1 = g(t, *Y)
-        #print(np.array(np.concatenate(Y[1:], [y_np1])))                                            # on calcule la dernière coordonnée de ce que renverra F, à savoir la valeur de la dérivées n+1ième de  y_n+1
-        return list(Y[1:]).extend([y_np1])
-        #return np.array(np.concatenate(Y[1:], [y_np1]))                                        # on renvoie le vecteur (y', y", ..., y(dérivée n+1ième))
-    
+        output = Y[1:]                                              # on crée le vecteur (y', y", ..., y(dérivée nième))
+        return np.append(output, y_np1)                             # on renvoie le vecteur (y', y", ..., y(dérivée nième), y(dérivée n+1ième))
+        
     x = np.linspace(t0, T, int((T-t0)/h))                           # on construit la liste des abscisses
     Y = odeint(F, Y0, x, tfirst=True)                               # on appelle scipy.integrate.odeint pour résoudre le système (utilisant une version améliorée de RK4)
     return x, Y[:,len(Y0)-1]
+
 
 #%%                             COMMANDES DIRECTES
 
@@ -182,13 +178,12 @@ def sol_exacte_dim_n(g, Y0, t0, T, h):
 g = lambda t, y, yp : -100 * sin(y)
 
 # Définition des courbes que l'on veut tracer
-x1, y1 = solution_dim_n(g, [pi/3, 0], 0, 10, 0.01, methode='euler')
-x2, y2 = solution_dim_n(g, [pi/3, 0], 0, 10, 0.01, methode='rk4')
-x3, y3 = solution_dim_n(g, [pi/3, 0], 0, 10, 0.01, methode='rk4')
-xs, ys = sol_exacte_dim_2(g, pi/3, 0, 0, 10, 0.001)
+x1, y1 = solution_dim_n(g, [pi/3, 0], 0, 5, 0.01, methode='euler')
+x2, y2 = solution_dim_n(g, [pi/3, 0], 0, 5, 0.01, methode='rk4')
+x3, y3 = solution_dim_n(g, [pi/3, 0], 0, 5, 0.1, methode='rk4')
+
+xs, ys = sol_exacte_dim_n(g, [pi/3, 0], 0, 5, 0.01)
 
 # Traçage des courbes
-traces.trace((x1, y1, 'Euler'), (x2, y2, 'RK4'), (x3, y3, 'RK4 pas de 1'), sol=(xs, ys))
-
-
+traces.trace((x1, y1, 'Euler'), (x2, y2, 'RK4'), (x3, y3, 'RK4 pas de 0.1'), sol=(xs, ys))
 
