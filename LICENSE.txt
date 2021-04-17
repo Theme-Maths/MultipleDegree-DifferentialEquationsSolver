@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2021 KOUDDANE Nada, SOUTEYRAND Justine
+Copyright (c) 2021 KOUDDANE Nada, SOUTEYRAND Justine, with the contributions of LAMRANI Hind, LOUISTISSERAND Juliette
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
