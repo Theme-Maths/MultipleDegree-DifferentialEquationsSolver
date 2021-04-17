@@ -1,23 +1,26 @@
 # -*- coding: utf-8 -*-
 """
+Ce fichier est chargé de résoudre les ED de dimension n, et d'interfacer les entrées utilisateur.
+
 Contient les fonctions de résolution à plusieurs dimensions :
-    - solution_dim_2(g, y0, yp0, t0, T, h) :
-        Résout une équation différentielle d'ordre 2 avec la méthode choisie
-    - sol_exacte_dim_2(g, y0, yp0, t0, T, h) :
-        Résout une équation différentielle d'ordre 2 avec odeint, méthode la plus précise implémentée dans Python.
+    - solution_dim_2(g, y0, yp0, t0, T, h, methode='rk4')
+    - solution_dim_n(g, Y0, t0, T, h, methode='rk4')
+    - sol_exacte_dim_2(g, y0, yp0, t0, T, h)
+    - sol_exacte_dim_n(g, Y0, t0, T, h)
 """
+
 import numpy as np
 from scipy.integrate import odeint
 import schemas_1d, traces
 from math import cos, atan, pi, sin, exp
 
 
-
 def solution_dim_2(g, y0, yp0, t0, T, h, methode='rk4'):
     """
     Résout une équation différentielle d'odre 2 avec la méthode choisie.
-    Renvoie un tuple x, y de la solution calculée.
-    Parameters
+    Renvoie un tuple x, y de la solution calculé.
+    
+    Paramètres
     ----------
     g   : fonction du problème de Cauchy
     y0  : valeur de la solution initiale de y
@@ -25,74 +28,70 @@ def solution_dim_2(g, y0, yp0, t0, T, h, methode='rk4'):
     t0  : valeur de la borne inférieure de l'intervalle de résolution
     T   : valeur de la borne supérieure de l'intervalle de résolution
     h   : valeur du pas
-    methode : méthodes de résolution possibles : 'euler', 'rk4'. Vaut 'rk4' par défaut.
-    Returns
+    methode : méthodes de résolution possibles ('euler' ou 'rk4'). Vaut 'rk4' par défaut.
+    
+    Renvoi
     -------
     t_list : liste des abscisses
-    Y_list : liste des approximations trouvées pour chaque t par la fonction de résolution
+    Y_list : liste des valeurs de calculées par la méthode
     """
     # NOTATIONS :
     # y   = y
     # yp  = y'
     # ypp = y" = g(t0, y0,  yp0) 
     
-    def F(t, Y):                                                    # on définit la fonction F du nouveau problème de Cauchy
-        (y, yp) = Y                                                 # on explicite les composantes de Y = (y, y')
-        ypp = g(t, y, yp)                                           # on calcule la dernière coordonnée de ce que renverra F, à savoir ypp
-        return [yp, ypp]                                            # on renvoie le vecteur (y', y")
+    def F(t, Y):                  # on définit la fonction F du nouveau problème de Cauchy
+        (y, yp) = Y
+        ypp = g(t, y, yp)         # on calcule la dernière coordonnée de ce que renverra F, à savoir ypp
+        return [yp, ypp]
     
-    Y0  = [y0, yp0]                                                 # on construit le vecteur des conditions initiales
-    
-    if methode == 'rk4':                                             # on appelle une fonction 1D pour résoudre l'équation 1D vectorielle obtenue
-        t_list, Y_list = schemas_1d.rk4_vect(F, Y0, t0, T, h)
+    Y0  = [y0, yp0]
+    if methode == 'rk4':
+        return schemas_1d.rk4_vect(F, Y0, t0, T, h)
     elif methode == 'euler':
-        t_list, Y_list = schemas_1d.euler_vect(F, Y0, t0, T, h)
+        return schemas_1d.euler_vect(F, Y0, t0, T, h)
     else :
-        raise ValueError("Méthode non reconnue. Méthodes connues : 'rk4', 'euler'.")
-        
-    return t_list, Y_list
+        raise ValueError("Méthode non reconnue. Les méthodes reconnues sont : 'rk4', 'euler'.")
 
 
 def solution_dim_n(g, Y0, t0, T, h, methode='rk4'):
     """
-    Résout une équation différentielle d'ordre n avec la méthode choisie.
+    Résout une équation différentielle d'ordre n > 1 avec la méthode choisie.
     Renvoie un tuple (x, y) de la solution calculée.
-    Parameters
+    
+    Paramètres
     ----------
     g   : fonction du problème de Cauchy (exemple dont la solution est exp(): g = lambda t, y, yp, ypp : ypp)
-    Y0  : liste contenant les conditions initiales dans l'ordre suivant : Y = [y0, yp0, ... y_(n-1)0]
+    Y0  : liste contenant les conditions initiales dans l'ordre suivant : Y0 = [y0, yp0, ... y_(n-1)0]
     t0  : valeur de la borne inférieure de l'intervalle de résolution
     T   : valeur de la borne supérieure de l'intervalle de résolution
     h   : valeur du pas
     methode : méthodes de résolution possibles : 'euler', 'rk4'. Vaut 'rk4' par défaut.
-    Returns
+    
+    Renvoi
     -------
     t_list : liste des abscisses
-    Y_list : liste des approximations trouvées pour chaque t par la fonction de résolution
+    Y_list : liste des valeurs de calculées par la méthode
     """
     
-    def F(t, Y):                                                    # on définit la fonction F du nouveau problème de Cauchy
-        y_np1 = g(t, *Y)                                            # on calcule la dernière coordonnée de ce que renverra F, 
-                                                                    # à savoir la valeur de la dérivées n+1ième de  y_n+1
-        return Y[1:]+[y_np1]                                        # on renvoie le vecteur (y', y", ..., y(dérivée n+1ième))
+    def F(t, Y):                  # on définit la fonction F du nouveau problème de Cauchy
+        y_np1 = g(t, *Y)          # on calcule la dernière coordonnée de ce que renverra F, à savoir la valeur de la dérivées n+1ième de y en t
+        return Y[1:]+[y_np1]
     
-    
-    if methode == 'rk4':                                            # on appelle une fonction 1D pour résoudre l'équation 1D 
-                                                                    # vectorielle obtenue
-        t_list, Y_list = schemas_1d.rk4_vect(F, Y0, t0, T, h)
+    if methode == 'rk4':
+        return schemas_1d.rk4_vect(F, Y0, t0, T, h)
     elif methode == 'euler':
-        t_list, Y_list = schemas_1d.euler_vect(F, Y0, t0, T, h)
+        return schemas_1d.euler_vect(F, Y0, t0, T, h)
     else :
-        raise AttributeError("Méthode non reconnue. Méthodes connues : 'rk4', 'euler'.")
-        
-    return t_list, Y_list
+        raise AttributeError("Méthode non reconnue. Les méthodes reconnues sont : 'rk4', 'euler'.")
 
 
 def sol_exacte_dim_2(g, y0, yp0, t0, T, h):
     """
-    Résout une équation différentielle d'ordre n avec odeint, méthode la plus précise implémentée dans Python.
+    Résout une équation différentielle d'ordre n avec scipy.integrate.odeint
     Renvoie un tuple x, y de la solution calculée.
-    Parameters
+    
+    Paramètres
     ----------
     g   : fonction du problème de Cauchy
     y0  : valeur de la solution initiale de y
@@ -100,19 +99,21 @@ def sol_exacte_dim_2(g, y0, yp0, t0, T, h):
     t0  : valeur de la borne inférieure de l'intervalle de résolution
     T   : valeur de la borne supérieure de l'intervalle de résolution
     h   : valeur du pas
-    Returns
+    
+    Renvoi
     -------
     t_list : liste des abscisses
     Y_list : liste des ordonnées de la 'solution exacte' trouvée
     """
-    def F(t, Y):                                                    # on définit la fonction F du nouveau problème de Cauchy
-        (y, yp) = Y                                                 # on explicite les composantes de Y = (y, y')
-        ypp = g(t, y, yp)                                           # on calcule la dernière coordonnée de ce que renverra F, à savoir ypp
-        return np.array([yp, ypp])                                  # on renvoie le vecteur (y', y")
     
-    Y0 = np.array([y0, yp0])                                        # on construit le vecteur des conditions initiales
-    x = np.linspace(t0, T, int((T-t0)/h))                           # on construit la liste des abscisses
-    Y = odeint(F, Y0, x, tfirst=True)                               # on appelle scipy.integrate.odeint pour résoudre le système (utilisant une version améliorée de RK4)
+    def F(t, Y):                                # on définit la fonction F du nouveau problème de Cauchy
+        (y, yp) = Y
+        ypp = g(t, y, yp)
+        return np.array([yp, ypp])
+    
+    Y0 = np.array([y0, yp0])
+    x = np.linspace(t0, T, int((T-t0)/h))       # on construit la liste des abscisses
+    Y = odeint(F, Y0, x, tfirst=True)
     return x, Y[:,0]
 
 
@@ -120,82 +121,78 @@ def sol_exacte_dim_n(g, Y0, t0, T, h):
     """
     Résout une équation différentielle d'ordre n avec odeint, méthode la plus précise implémentée dans Python.
     Renvoie un tuple x, y de la solution calculée.
-    Parameters
+    
+    Paramètres
     ----------
     g   : fonction du problème de Cauchy
     Y0  : liste contenant les conditions initiales dans l'ordre suivant : Y = [y0, yp0, ... y_(n-1)0]
     t0  : valeur de la borne inférieure de l'intervalle de résolution
     T   : valeur de la borne supérieure de l'intervalle de résolution
     h   : valeur du pas
-    Returns
+    
+    Renvoi
     -------
     t_list : liste des abscisses
     Y_list : liste des ordonnées de la 'solution exacte' trouvée
     """
+    
     Y0=np.array(Y0)
     t0 = np.array(t0)
-    def F(t, Y):                                                    # on définit la fonction F du nouveau problème de Cauchy
+    
+    def F(t, Y):                                # on définit la fonction F du nouveau problème de Cauchy
         y_np1 = g(t, *Y)
-        output = Y[1:]                                              # on crée le vecteur (y', y", ..., y(dérivée nième))
-        return np.append(output,y_np1)                              # on renvoie le vecteur (y', y", ..., y(dérivée nième), y(dérivée n+1ième))
-    x = np.linspace(t0, T, int((T-t0)/h))                           # on construit la liste des abscisses
-    Y = odeint(F, Y0, x, tfirst=True)                               # on appelle scipy.integrate.odeint pour résoudre le système (utilisant une version améliorée de RK4)
+        output = Y[1:]
+        return np.append(output,y_np1)
+    
+    x = np.linspace(t0, T, int((T-t0)/h))       # on construit la liste des abscisses
+    Y = odeint(F, Y0, x, tfirst=True)
     return x, Y[:,0]
 
 
 #%%                             COMMANDES DIRECTES
 
-# # Définition de la fonction g à résoudre
-#g = lambda t, y, yp : 3*yp - 20*y + 5
+
+# EXEMPLE 1 DE LA PRESENTATION ------------------------------------------------
+
+# # Définition de la fonction g du problème de Cauchy
+# g = lambda t, y, yp : 3*yp - 20*y + 5
 
 # # Définition des courbes que l'on veut tracer
-#x1, y1 = solution_dim_2(g, 0, 0, 0, 3, 0.5, methode='rk4')
-#x2, y2 = solution_dim_2(g, 0, 0, 0, 3, 0.2, methode='rk4')
-#x3, y3 = solution_dim_2(g, 0, 0, 0, 3, 0.01, methode='rk4')
-#xs, ys = sol_exacte_dim_2(g, 0, 0, 0, 3, 0.001)
+# x1, y1 = solution_dim_2(g, 0, 0, 0, 3, 0.01, methode='rk4')
+# x2, y2 = solution_dim_2(g, 0, 0, 0, 3, 0.01, methode='rk4')
+# x3, y3 = solution_dim_2(g, 0, 0, 0, 3, 0.1, methode='rk4')
+# xs, ys = sol_exacte_dim_2(g, 0, 0, 0, 3, 0.001)
 
-# # Traçage des courbes
-#traces.trace((x1, y1, 'RK4 pas de 0.5'), (x2, y2, 'RK4 pas de 0.1'), (x3, y3, 'RK4 pas de 0.01'),sol=(xs, ys))
+# # Tracé des courbes
+# traces.trace((x1, y1, 'Euler pas de 0.01'), (x2, y2, 'RK4 pas de 0.01'), (x3, y3, 'RK4 pas de 0.1'), sol=(xs, ys))
 
 
 
+# EXEMPLE 2 DE LA PRESENTATION ------------------------------------------------
 
 # # Définition de la fonction g à résoudre
-#g = lambda t, y, yp, ypp: 1/4 * (cos(t*ypp) - atan(yp))
+# g = lambda t, y, yp, ypp: 1/4 * (cos(t*ypp) - atan(yp))
 
 # # Définition des courbes que l'on veut tracer
-#x1, y1 = solution_dim_n(g, [0, 0, 0], 0, 50, 0.1, methode='rk4')
-#x2, y2 = solution_dim_n(g, [0, 0, 0], 0, 50, 0.05, methode='rk4')
-#x3, y3 = solution_dim_n(g, [0, 0, 0], 0, 50, 0.025, methode='rk4')
-#xs, ys = sol_exacte_dim_n(g, [0, 0, 0], 0, 50, 0.025)
+# x1, y1 = solution_dim_n(g, [0, 0, 0], 0, 50, 0.2, methode='euler')
+# x2, y2 = solution_dim_n(g, [0, 0, 0], 0, 50, 0.1, methode='euler')
+# x3, y3 = solution_dim_n(g, [0, 0, 0], 0, 50, 0.05, methode='euler')
+# xs, ys = sol_exacte_dim_n(g, [0, 0, 0], 0, 50, 0.025)
 
 # # Traçage des courbes
-#traces.trace((x1, y1, 'Euler, pas de 0.2'),(x2, y2, 'Euler, pas de 0.1'), (x3, y3, 'Euler, pas de 0.01'), sol=(xs, ys))
-
-# Définition de la fonction g à résoudre
-#g = lambda t, y, yp : -100 * sin(y)
-
-# Définition des courbes que l'on veut tracer
-#x1, y1 = solution_dim_n(g, [pi/3, 0], 0, 10, 0.01, methode='euler')
-#x2, y2 = solution_dim_n(g, [pi/3, 0], 0, 10, 0.01, methode='rk4')
-#x3, y3 = solution_dim_n(g, [pi/3, 0], 0, 10, 0.1, methode='rk4')
-
-#xs, ys = sol_exacte_dim_n(g, [pi/3, 0], 0, 10, 0.01)
-
-# Traçage des courbes
-#traces.trace((x1, y1, 'Euler'),(x2, y2, 'RK4'), (x3, y3, 'RK4 pas de 0.1'), sol=(xs, ys))
+# traces.trace((x1, y1, 'Euler, pas de 0.2'),(x2, y2, 'Euler, pas de 0.1'), (x3, y3, 'Euler, pas de 0.05'), sol=(xs, ys))
 
 
 
-# Définition de la fonction g à résoudre
-#g = lambda t, y, yp : -2*0.22*yp-4**2*sin(y)
+# EXEMPLE DU PENDULE ----------------------------------------------------------
 
-# Définition des courbes que l'on veut tracer
-#x1, y1 = solution_dim_n(g, [1.3, 0], 0, 5, 0.001, methode='euler')
-#x2, y2 = solution_dim_n(g, [1.3,0], 0, 5, 0.001, methode='rk4')
+# # Définition de la fonction g à résoudre
+# g = lambda t, y, yp : -2*0.22*yp-4**2*sin(y)
 
-#xs, ys = sol_exacte_dim_n(g, [1.3,0], 0, 5, 0.001)
+# # Définition des courbes que l'on veut tracer
+# x1, y1 = solution_dim_n(g, [1.3, 0], 0, 5, 0.001, methode='euler')
+# x2, y2 = solution_dim_n(g, [1.3,0], 0, 5, 0.001, methode='rk4')
+# xs, ys = sol_exacte_dim_n(g, [1.3,0], 0, 5, 0.001)
 
-# Traçage des courbes
-#traces.trace((x1, y1, 'Euler pas de 0.001'),(x2, y2, 'RK4 pas de 0.001'), sol=(xs, ys))
-# %%
+# # Traçage des courbes
+# traces.trace((x1, y1, 'Euler, pas de 0.001'),(x2, y2, 'RK4, pas de 0.001'), sol=(xs, ys))
