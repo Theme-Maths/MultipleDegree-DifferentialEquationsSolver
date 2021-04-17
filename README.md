@@ -1,6 +1,7 @@
 # Projet-AnNum2
 
-WARNING : every script is commented / documented in French
+This project is licensed under the terms of the MIT license.
+WARNING : Every script is commented / documented in French only.
 
 
 # Organisation des Fichiers :
